@@ -1,0 +1,175 @@
+
+char val=' ';
+char val_ant=' ';
+int tiempo_pwm=0;
+int giro_izquierda=0;
+int giro_derecha=0;
+
+void setup() {
+  // Se inicia la comunicacion serial. 
+  Serial.begin(9600);
+   // Se definen los pines a utilizar.
+  pinMode(2,OUTPUT);
+  pinMode(3,OUTPUT);
+  pinMode(4,OUTPUT);
+  pinMode(5,OUTPUT);
+}
+
+void loop() 
+{
+  //Lectura del puerto serial.
+  if(Serial.available() > 0) 
+  {
+    val = Serial.read();    
+  }
+  // Condiciones de arranque y frenado del motor. 
+  //LADO IZQUIERDO //
+  // Si es a, lo leido, entonces...
+  if(val=='a')
+  {
+  // Se mira cual fue el valor anterior. 
+    if(val_ant=='b')
+    {
+      frenado_derecha();
+      set_izquierda();
+    }   
+  // Se determina el valor anterior.    
+    val_ant='a';
+  // Se encienden/apagan los pines necesarios. 
+    digitalWrite(2,HIGH);
+    digitalWrite(4,HIGH);
+    digitalWrite(3,LOW);
+    digitalWrite(5,LOW);    
+  }
+  
+if(val=='b')
+  {
+    if(val_ant=='a')
+    {
+      frenado_izquierda();
+      set_derecha();
+    }
+    val_ant='b';
+    digitalWrite(2,LOW);
+    digitalWrite(4,LOW);
+    digitalWrite(3,HIGH);
+    digitalWrite(5,HIGH);    
+    
+  }
+if(val=='c')
+  {
+    if(val_ant=='a')
+    {
+      frenado_izquierda();
+    }
+    if(val_ant=='b')
+    {
+      frenado_derecha();
+    }
+    val_ant='c';
+    digitalWrite(2,LOW);
+    digitalWrite(4,LOW);
+    digitalWrite(3,LOW);
+    digitalWrite(5,LOW);    
+  }
+if(val=='q')
+  {
+    val_ant='c';
+    digitalWrite(2,LOW);
+    digitalWrite(4,LOW);
+    digitalWrite(3,LOW);
+    digitalWrite(5,LOW);
+    //Serial.end(); 
+    delay(1000);  
+    //Serial.begin(9600); 
+ }
+}
+void set_izquierda()
+{
+  giro_izquierda=1;
+  giro_derecha=0;
+  arranque_izquierda();
+}
+
+void set_derecha()
+{
+  giro_derecha=1;
+  giro_izquierda=0;
+  arranque_derecha();
+}
+// Se arranca para el lado izquierdo. 
+void arranque_izquierda()
+{
+  tiempo_pwm=0;
+  while(tiempo_pwm<1000)
+  {
+    digitalWrite(2,HIGH);
+    digitalWrite(4,HIGH);
+    digitalWrite(3,LOW);
+    digitalWrite(5,LOW);
+    delayMicroseconds(tiempo_pwm);
+    digitalWrite(2,LOW);
+    digitalWrite(4,LOW);
+    digitalWrite(3,LOW);
+    digitalWrite(5,LOW);
+    delayMicroseconds(tiempo_pwm-100);
+    tiempo_pwm=tiempo_pwm+1;
+   }  
+}
+// Se frena viniendo del lado izquierdo. 
+void frenado_izquierda()
+{
+int tiempo_temp=1000;
+  while(tiempo_temp>0)
+  {
+    digitalWrite(2,HIGH);
+    digitalWrite(4,HIGH);
+    digitalWrite(3,LOW);
+    digitalWrite(5,LOW);
+    delayMicroseconds(tiempo_temp);
+    digitalWrite(2,LOW);
+    digitalWrite(4,LOW);
+    digitalWrite(3,LOW);
+    digitalWrite(5,LOW);
+    delayMicroseconds(tiempo_temp);
+    tiempo_temp=tiempo_temp-1;
+   }  
+}
+void arranque_derecha()
+{
+  tiempo_pwm=0;
+  while(tiempo_pwm<1000)
+  {
+    digitalWrite(2,LOW);
+    digitalWrite(4,LOW);
+    digitalWrite(3,HIGH);
+    digitalWrite(5,HIGH);
+    delayMicroseconds(tiempo_pwm);
+    digitalWrite(2,LOW);
+    digitalWrite(4,LOW);
+    digitalWrite(3,LOW);
+    digitalWrite(5,LOW);
+    delayMicroseconds(tiempo_pwm-100);
+    tiempo_pwm=tiempo_pwm+1;
+   }     
+}  
+   
+
+void frenado_derecha()
+{
+int tiempo_temp=1000;
+  while(tiempo_temp>0)
+  {
+    digitalWrite(2,LOW);
+    digitalWrite(4,LOW);
+    digitalWrite(3,HIGH);
+    digitalWrite(5,HIGH);
+    delayMicroseconds(tiempo_temp);
+    digitalWrite(2,LOW);
+    digitalWrite(4,LOW);
+    digitalWrite(3,LOW);
+    digitalWrite(5,LOW);
+    delayMicroseconds(tiempo_temp);
+    tiempo_temp=tiempo_temp-1;
+   }  
+}
